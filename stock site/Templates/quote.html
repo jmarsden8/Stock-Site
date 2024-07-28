@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quote
+{% endblock %}
+
+{% block main %}
+
+<h2>Get a stock quote</h2>
+<form action="{{ url_for('quote') }}" method="POST">
+    <label for="symbol">Symbol</label>
+    <!-- Input field for the symbol with an oninput event calling getAutocomplete() function -->
+    <input type="text" name="symbol" id="symbol" placeholder="Symbol" oninput="getAutocomplete(this.value)">
+    <!-- Empty list for displaying autocomplete suggestions -->
+    <ul id="autocomplete-list"></ul>
+    <!-- Button to submit the form and get the stock quote -->
+    <button type="submit">Get quote</button>
+</form>
+
+    {% if quote %}
+        <h3>{{ quote['name'] }} ({{ quote['symbol']}})</h3>
+        <p>Price: {{ quote['price']|usd }}</p>
+    {% endif %}
+
+    <script>
+    function getAutocomplete(input) {
+        fetch(`/autocomplete?input=${input}`)
+            .then(response => response.json())
+            .then(data => {
+                const autocompleteList = document.getElementById('autocomplete-list');
+                autocompleteList.innerHTML = '';
+                data.forEach(symbol => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = symbol;
+                    autocompleteList.appendChild(listItem);
+                });
+            });
+    }
+    </script>
+{% endblock %}
